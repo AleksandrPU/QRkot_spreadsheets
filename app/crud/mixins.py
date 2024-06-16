@@ -1,10 +1,9 @@
-from typing import Union
-
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import CharityProject, Donation
+from app.models import CharityProject
+from app.schemas.charity_project import CharityProjectUpdate
 
 
 class GetMixin:
@@ -13,7 +12,7 @@ class GetMixin:
             self,
             obj_id: int,
             session: AsyncSession
-    ) -> Union[CharityProject, Donation]:
+    ) -> CharityProject:
         obj = await session.execute(
             select(self.model).where(self.model.id == obj_id)
         )
@@ -24,10 +23,10 @@ class UpdateMixin(GetMixin):
 
     async def update(
             self,
-            db_obj,
-            obj_in,
+            db_obj: CharityProject,
+            obj_in: CharityProjectUpdate,
             session: AsyncSession
-    ) -> Union[CharityProject, Donation]:
+    ) -> CharityProject:
         obj_data = jsonable_encoder(db_obj)
         update_data = obj_in.dict(exclude_unset=True)
 
@@ -46,9 +45,9 @@ class DeleteMixin(GetMixin):
 
     async def remove(
             self,
-            db_obj,
+            db_obj: CharityProject,
             session: AsyncSession
-    ) -> Union[CharityProject, Donation]:
+    ) -> CharityProject:
         await session.delete(db_obj)
         await session.commit()
 
