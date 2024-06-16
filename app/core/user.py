@@ -5,12 +5,12 @@ from fastapi_users import (
     BaseUserManager,
     FastAPIUsers,
     IntegerIDMixin,
-    InvalidPasswordException,
+    InvalidPasswordException
 )
 from fastapi_users.authentication import (
     AuthenticationBackend,
     BearerTransport,
-    JWTStrategy,
+    JWTStrategy
 )
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession

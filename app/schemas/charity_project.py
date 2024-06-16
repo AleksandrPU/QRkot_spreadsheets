@@ -6,7 +6,7 @@ from pydantic import BaseModel, Extra, Field, PositiveInt, validator
 from app.core.constants import (
     DESCRIPTION_MIN_LENGTH,
     NAME_MAX_LENGTH,
-    NAME_MIN_LENGTH,
+    NAME_MIN_LENGTH
 )
 
 

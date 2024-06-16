@@ -9,7 +9,7 @@ from app.models import User
 from app.schemas.donation import (
     DonationCreate,
     DonationDBSuperUser,
-    DonationDBUser,
+    DonationDBUser
 )
 from app.services.investment import investment
 
