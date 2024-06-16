@@ -4,3 +4,11 @@ NAME_MAX_LENGTH = 100
 NAME_MIN_LENGTH = 1
 
 PASSWORD_MIN_LENGTH = 3
+
+# Google API Client
+GOOGLE_DOCS_SHEETS_URL = 'https://docs.google.com/spreadsheets/d/'
+GOOGLE_SHEET_RANGE = 'A1:C30'
+DATE_FORMAT = '%Y/%m/%d %H:%M:%S'
+SHEET_ID = 0
+ROW_COUNT = 100
+COLUMN_COUNT = 100
