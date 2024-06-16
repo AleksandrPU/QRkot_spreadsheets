@@ -46,6 +46,8 @@ markupsafe==2.1.1
 mccabe==0.6.1
 mixer==7.2.2
 multidict==6.0.2; python_version >= '3.7'
+mypy==1.10.0
+mypy-extensions==1.0.0
 packaging==21.3; python_version >= '3.6'
 passlib[bcrypt]==1.7.4
 pluggy==1.0.0
@@ -72,6 +74,7 @@ rsa==4.8; python_version >= '3.6'
 six==1.16.0
 sniffio==1.2.0
 sqlalchemy==1.4.36
+sqlalchemy2-stubs==0.0.2a38
 starlette==0.19.1
 toml==0.10.2
 tonyg-rfc3339==0.1
