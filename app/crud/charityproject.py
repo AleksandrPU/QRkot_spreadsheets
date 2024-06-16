@@ -1,7 +1,8 @@
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import asc
 
 from app.models import CharityProject
 
@@ -23,6 +24,24 @@ class CRUDCharityProject(CRUDBase, UpdateMixin, DeleteMixin):
         )
         db_project_id = db_project_id.scalars().first()
         return db_project_id
+
+    async def get_projects_by_completion_rate(
+            self,
+            session: AsyncSession
+    ):
+        closed_projects = await session.execute(
+            select([
+                CharityProject.name,
+                CharityProject.description,
+                (
+                    func.unixepoch(CharityProject.close_date, 'subsec') -
+                    func.unixepoch(CharityProject.create_date, 'subsec')
+                ).label('length')
+            ]).where(
+                CharityProject.fully_invested
+            ).order_by(asc('length'))
+        )
+        return closed_projects.all()
 
 
 charity_project_crud = CRUDCharityProject(CharityProject)
