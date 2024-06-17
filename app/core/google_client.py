@@ -1,12 +1,13 @@
 import logging
 from http import HTTPStatus
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Optional
 
 from aiogoogle import Aiogoogle
 from aiogoogle.auth.creds import ServiceAccountCreds
-from fastapi import HTTPException
+from fastapi import Depends, HTTPException
 
 from .config import settings
+from .exceptions import EmptyGoogleAPIOptions
 
 logger = logging.getLogger('uvicorn')
 
@@ -28,28 +29,22 @@ INFO = {
     'client_x509_cert_url': settings.client_x509_cert_url
 }
 
-message = None
-for key, value in INFO.items():
-    if not value:
-        message = f'Параметр {key} для Google API не заполнен'
-        break
-else:
+
+async def check_google_api_options():
+    for key, value in INFO.items():
+        if not value:
+            raise EmptyGoogleAPIOptions(key)
     if not settings.email:
-        message = 'Емайл пользователя для Google API не заполнен'
-
-credentials = None
-if message:
-    logger.warning(message)
-else:
-    credentials = ServiceAccountCreds(scopes=SCOPES, **INFO)
+        raise EmptyGoogleAPIOptions('email')
 
 
-async def get_service() -> AsyncGenerator:
-    if credentials:
-        async with Aiogoogle(service_account_creds=credentials) as aiogoogle:
-            yield aiogoogle
-    else:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_ACCEPTABLE,
-            detail=message
-        )
+async def get_service_account_creds() -> ServiceAccountCreds:
+    await check_google_api_options()
+    return ServiceAccountCreds(scopes=SCOPES, **INFO)
+
+
+async def get_service(
+        credentials: ServiceAccountCreds = Depends(get_service_account_creds)
+) -> AsyncGenerator:
+    async with Aiogoogle(service_account_creds=credentials) as aiogoogle:
+        yield aiogoogle
