@@ -1,16 +1,15 @@
 from collections import deque
 from datetime import datetime
-from typing import Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import charity_project_crud, donation_crud
-from app.models import CharityProject, Donation
+from app.models import BaseProjectDonation, CharityProject, Donation
 
 
 async def close_project_donation(
-        obj: Union[CharityProject, Donation]
-) -> Union[CharityProject, Donation]:
+        obj: BaseProjectDonation
+) -> BaseProjectDonation:
     """Закрываем полностью проинвестированный проект/пожертвование."""
 
     if obj.invested_amount == obj.full_amount:
@@ -22,7 +21,7 @@ async def close_project_donation(
 async def calculate_investment(
         project_queue: deque[CharityProject],
         donation_queue: deque[Donation]
-) -> list[Union[CharityProject, Donation]]:
+) -> list[BaseProjectDonation]:
     """Вычисления при инвестировании."""
 
     changed_objs = []
@@ -59,9 +58,9 @@ async def calculate_investment(
 
 
 async def investment(
-        obj: Union[CharityProject, Donation],
+        obj: BaseProjectDonation,
         session: AsyncSession
-) -> Union[CharityProject, Donation]:
+) -> BaseProjectDonation:
     """Инвестируем пожертвования в проекты."""
 
     not_invested_projects = await charity_project_crud.get_multi(
