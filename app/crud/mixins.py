@@ -35,8 +35,8 @@ class UpdateMixin(GetMixin):
                 setattr(db_obj, field, update_data[field])
 
         session.add(db_obj)
-        await session.commit()
-        await session.refresh(db_obj)
+        # await session.commit()
+        # await session.refresh(db_obj)
 
         return db_obj
 
