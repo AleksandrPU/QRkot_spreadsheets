@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.utils import to_investment
 from app.api.validators import (
     check_name_duplicate,
     check_project_empty,
@@ -11,13 +12,13 @@ from app.api.validators import (
 )
 from app.core.db import get_async_session
 from app.core.user import current_superuser
-from app.crud import charity_project_crud, donation_crud
+from app.crud import charity_project_crud
 from app.schemas.charity_project import (
     CharityProjectCreate,
     CharityProjectDB,
     CharityProjectUpdate
 )
-from app.services.investment import close_project_donation, investment
+from app.services.investment import close_project_donation
 
 router = APIRouter()
 
@@ -52,20 +53,8 @@ async def create_project(
 
     await check_name_duplicate(charity_project.name, session)
     new_project = await charity_project_crud.create(charity_project, session)
-    not_invested_projects = await charity_project_crud.get_multi(
-        session, not_full_invested=True)
-    new_project.invested_amount = 0
-    not_invested_projects.append(new_project)
-    not_invested_donations = await donation_crud.get_multi(
-        session, not_full_invested=True)
-    changed_objs = await investment(
-        not_invested_projects,
-        not_invested_donations
-    )
 
-    session.add_all(changed_objs)
-    await session.commit()
-    await session.refresh(new_project)
+    new_project = await to_investment(new_project, session)
 
     return jsonable_encoder(new_project)
 
@@ -118,18 +107,7 @@ async def update_project(
 
     project = await charity_project_crud.update(project, project_in, session)
     project = await close_project_donation(project)
-    not_invested_projects = await charity_project_crud.get_multi(
-        session, not_full_invested=True)
-    not_invested_projects.append(project)
-    not_invested_donations = await donation_crud.get_multi(
-        session, not_full_invested=True)
-    changed_objs = await investment(
-        not_invested_projects,
-        not_invested_donations
-    )
 
-    session.add_all(changed_objs)
-    await session.commit()
-    await session.refresh(project)
+    project = await to_investment(project, session)
 
     return jsonable_encoder(project)
