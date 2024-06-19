@@ -1,15 +1,11 @@
-import logging
-from http import HTTPStatus
-from typing import AsyncGenerator, Optional
+from typing import AsyncGenerator
 
 from aiogoogle import Aiogoogle
 from aiogoogle.auth.creds import ServiceAccountCreds
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 
 from .config import settings
 from .exceptions import EmptyGoogleAPIOptions
-
-logger = logging.getLogger('uvicorn')
 
 SCOPES = [
     'https://www.googleapis.com/auth/spreadsheets',
